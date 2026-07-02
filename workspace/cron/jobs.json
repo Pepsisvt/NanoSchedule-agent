@@ -1,0 +1,121 @@
+{
+  "version": 1,
+  "jobs": [
+    {
+      "id": "e1577f8b",
+      "name": "reminder:16:⏰ 半分钟提醒到了！",
+      "enabled": true,
+      "schedule": {
+        "kind": "at",
+        "atMs": 1782290310000,
+        "everyMs": null,
+        "expr": null,
+        "tz": null
+      },
+      "payload": {
+        "kind": "agent_turn",
+        "message": "[REMINDER] ⏰ 半分钟提醒到了！",
+        "deliver": false,
+        "channel": null,
+        "to": null,
+        "channelMeta": {},
+        "sessionKey": "websocket:dcec9b24-4bbb-4b27-82a1-21c50531d3d4",
+        "originChannel": "websocket",
+        "originChatId": "dcec9b24-4bbb-4b27-82a1-21c50531d3d4",
+        "originMetadata": {}
+      },
+      "state": {
+        "nextRunAtMs": null,
+        "lastRunAtMs": null,
+        "lastStatus": null,
+        "lastError": null,
+        "runHistory": []
+      },
+      "createdAtMs": 1782290311490,
+      "updatedAtMs": 1782290311490,
+      "deleteAfterRun": true
+    },
+    {
+      "id": "dream",
+      "name": "dream",
+      "enabled": true,
+      "schedule": {
+        "kind": "every",
+        "atMs": null,
+        "everyMs": 7200000,
+        "expr": null,
+        "tz": null
+      },
+      "payload": {
+        "kind": "system_event",
+        "message": "",
+        "deliver": false,
+        "channel": null,
+        "to": null,
+        "channelMeta": {},
+        "sessionKey": null,
+        "originChannel": null,
+        "originChatId": null,
+        "originMetadata": {}
+      },
+      "state": {
+        "nextRunAtMs": 1782976922783,
+        "lastRunAtMs": 1782969722778,
+        "lastStatus": "ok",
+        "lastError": null,
+        "runHistory": [
+          {
+            "runAtMs": 1782969722778,
+            "status": "ok",
+            "durationMs": 5,
+            "error": null
+          }
+        ]
+      },
+      "createdAtMs": 1782959161561,
+      "updatedAtMs": 1782969722783,
+      "deleteAfterRun": false
+    },
+    {
+      "id": "heartbeat",
+      "name": "heartbeat",
+      "enabled": true,
+      "schedule": {
+        "kind": "every",
+        "atMs": null,
+        "everyMs": 1800000,
+        "expr": null,
+        "tz": "Asia/Shanghai"
+      },
+      "payload": {
+        "kind": "system_event",
+        "message": "",
+        "deliver": false,
+        "channel": null,
+        "to": null,
+        "channelMeta": {},
+        "sessionKey": null,
+        "originChannel": null,
+        "originChatId": null,
+        "originMetadata": {}
+      },
+      "state": {
+        "nextRunAtMs": 1782971522784,
+        "lastRunAtMs": 1782969722783,
+        "lastStatus": "ok",
+        "lastError": null,
+        "runHistory": [
+          {
+            "runAtMs": 1782969722783,
+            "status": "ok",
+            "durationMs": 1,
+            "error": null
+          }
+        ]
+      },
+      "createdAtMs": 1782959161565,
+      "updatedAtMs": 1782969722784,
+      "deleteAfterRun": false
+    }
+  ]
+}
