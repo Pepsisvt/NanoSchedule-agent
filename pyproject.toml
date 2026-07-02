@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "nanobot-calendar"
+version = "0.1.0"
+description = "Calendar and reminder tools for nanobot - 日程管理和提醒工具"
+requires-python = ">=3.10"
+dependencies = [
+    "apscheduler>=3.11",
+]
+
+[project.entry-points."nanobot.tools"]
+create_event = "nanobot_calendar.calendar_tools:CreateEventTool"
+query_events = "nanobot_calendar.calendar_tools:QueryEventsTool"
+update_event = "nanobot_calendar.calendar_tools:UpdateEventTool"
+delete_event = "nanobot_calendar.calendar_tools:DeleteEventTool"
+check_conflict = "nanobot_calendar.calendar_tools:CheckConflictTool"
+setup_reminder = "nanobot_calendar.reminder_tools:SetupReminderTool"
+list_reminders = "nanobot_calendar.reminder_tools:ListRemindersTool"
+cancel_reminder = "nanobot_calendar.reminder_tools:CancelReminderTool"
+upcoming_reminders = "nanobot_calendar.reminder_tools:UpcomingRemindersTool"
+analyze_schedule = "nanobot_calendar.advisor_tools:AnalyzeScheduleTool"
+enable_proactive = "nanobot_calendar.proactive_tools:EnableProactiveTool"
+disable_proactive = "nanobot_calendar.proactive_tools:DisableProactiveTool"
+multi_agent_decide = "nanobot_calendar.coordinator:CoordinatorTool"
+remember = "nanobot_calendar.memory_tools:RememberTool"
+my_profile = "nanobot_calendar.memory_tools:MyProfileTool"
+emotion_detect = "nanobot_calendar.memory_tools:EmotionDetectTool"
+daily_reflection = "nanobot_calendar.memory_tools:DailyReflectionTool"
