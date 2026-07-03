@@ -20,6 +20,19 @@ _queue: list[dict[str, Any]] = []
 _lock = threading.Lock()
 _pushed_ids: set[str] = set()
 _last_push_kind: str = ""
+_recent_topics: list[str] = []  # 最近3次闲聊的话题关键词，避免重复
+_MAX_RECENT_TOPICS = 3
+
+
+def _track_topic(msg: str) -> None:
+    """从消息中提取关键词，记录到最近话题列表"""
+    global _recent_topics
+    keywords = ["电影", "音乐", "游戏", "吃饭", "运动", "学习", "旅行", "睡觉", "周末", "工作", "心情", "天气", "看书", "追剧"]
+    found = [k for k in keywords if k in msg]
+    if found:
+        _recent_topics.append(found[0])
+        if len(_recent_topics) > _MAX_RECENT_TOPICS:
+            _recent_topics = _recent_topics[-_MAX_RECENT_TOPICS:]
 
 _MORNING_TOPICS = [
     "早上好呀～新的一天 ☀️ 今天感觉怎么样？",
@@ -34,23 +47,51 @@ _EVENING_TOPICS = [
 ]
 
 _IDLE_CHECKINS = [
-    "嘿{name}，好久没聊了～最近怎么样呀？",
-    "闲着没事来看看{name}！一切都顺利吗？",
+    "嘿{name}，这会儿在干嘛呢～",
+    "闲着来看看{name}！今天过得咋样？",
     "在嘛在嘛～突然想找你聊聊天 😄",
     "哈喽{name}，还在忙吗？",
     "{name}，今天心情怎么样呀～",
-    "没啥事，就是来看看你",
+    "没啥事，就是来看看你在干嘛",
+    "突然闪现！{name}忙不忙呀～",
+    "来串个门～{name}今天状态如何？",
+    "叮咚～你的日程助手来闲聊了 📫",
+    "有点想{name}了哈哈，在干嘛呢",
 ]
 
 _FUN_STARTERS = [
-    "聊点别的～{name}最近有看什么好看的剧或者电影嘛？",
+    "聊点别的～{name}最近有什么好看的剧或者电影嘛？🎬",
     "突然好奇，{name}平时喜欢听什么歌？🎵",
     "如果给你一天完全空闲，你最想干嘛呀～",
-    "有没有什么想去但一直没去的地方呀？",
+    "有没有什么想去但一直没去的地方呀？✈️",
     "{name}周末一般喜欢干嘛？",
-    "突然想到一个问题——你最怀念什么时候呀？",
+    "好奇一下——{name}最怀念什么时候呀？",
     "如果有一种超能力，{name}最想要什么？",
+    "最近有什么特别上头的事吗？游戏、小说、综艺都行～",
+    "{name}小时候的梦想是啥呀，现在还想做吗？",
+    "话说{name}觉得什么样的日子才算完美的一天？☀️",
+    "来聊点轻松的～{name}最近有没有踩到什么雷（烂片/难吃的店）？",
+    "想问问{name}——你觉得自己是早起党还是熬夜党？🌙",
 ]
+
+# 记录最近使用的 prompt 索引，避免连续重复
+_last_idle_idx = -1
+_last_fun_idx = -1
+
+def _pick_topic(topics: list[str]) -> str:
+    """随机选话题，避免连续两次一样"""
+    global _last_idle_idx, _last_fun_idx
+    import random
+    idx = random.randrange(len(topics))
+    if topics is _IDLE_CHECKINS:
+        while idx == _last_idle_idx and len(topics) > 1:
+            idx = random.randrange(len(topics))
+        _last_idle_idx = idx
+    elif topics is _FUN_STARTERS:
+        while idx == _last_fun_idx and len(topics) > 1:
+            idx = random.randrange(len(topics))
+        _last_fun_idx = idx
+    return topics[idx]
 
 
 class FriendBrain:
@@ -178,13 +219,18 @@ class FriendBrain:
     def _llm_chat(self, now: datetime) -> str | None:
         """用 LLM 生成一条自然的、个性化的主动聊天消息。"""
         query = f"用户{self._time_vibe(now.hour)}的习惯和偏好"
+        # 轮流使用不同的闲聊角度
+        angles = [
+            f"{self._time_vibe(now.hour)}问候，关心一下用户现在在干嘛。1-2句带emoji，像微信朋友。",
+            "突然想到一个话题——问问用户最近看了什么、听了什么、玩了什么。1-2句。",
+            "关心用户心情，问问今天过得怎么样、累不累。1-2句，温暖一点。",
+            "分享一点积极的东西，比如天气好、今天适合做什么。1-2句简短。",
+            "随便打个招呼，问问用户有没有什么新鲜事。自然随意，别刻意。",
+        ]
+        import random
         return self._call_llm(
             self._build_system_prompt(now, query),
-            [
-                f"现在是{self._time_vibe(now.hour)}，像朋友一样发一条问候。不提日程不催事。1-2句带emoji。",
-                "发一条闲聊，问问用户最近怎么样、忙不忙、心情如何。1-2句。别编造不存在的事。",
-                "关心一下朋友，随口问个近况。像突然想起来找他聊天。1-2句，别啰嗦。",
-            ],
+            [random.choice(angles)],
             rag_query=query,
         )
 
@@ -265,7 +311,15 @@ class FriendBrain:
             "2. 别提和当前时间矛盾的推荐——晚上10点别推荐吃午饭，早上8点别推荐吃晚饭。"
             "3. 别凭空编造你不知道的事（比如'我发现一本好看的小说'——用户一问细节你就露馅了）。"
             "4. 要么关心近况，要么推荐具体的东西（说出名字）。"
+            "5. 每次发起话题要多样化——上次聊了A，下次聊B，别当复读机。"
         )
+
+        # 防重复：提示最近聊过的话题
+        if _recent_topics:
+            avoid = "、".join(_recent_topics)
+            base += f"\n\n⚠️ 最近几次聊过这些话题：{avoid}。请避开这些，找个新方向聊。"
+
+        return base
 
         # 注入 RAG 检索到的相关记忆
         if context_query:
@@ -365,9 +419,9 @@ class FriendBrain:
         if sid not in _pushed_ids:
             msg = self._llm_chat(now)
             if not msg:
-                # 回退：话题池 + 名字填充
-                topics = _IDLE_CHECKINS + _FUN_STARTERS
-                tpl = random.choice(topics)
+                # 回退：话题池 + 名字填充 + 防重复
+                topics = _IDLE_CHECKINS if random.random() < 0.5 else _FUN_STARTERS
+                tpl = _pick_topic(topics)
                 try:
                     from nanobot_calendar import memory_engine as mem
                     data = mem._load()
@@ -378,6 +432,8 @@ class FriendBrain:
                 except Exception:
                     pass
                 msg = tpl.replace("{name}，", "").replace("{name}", "")
+            # 记录话题关键词，防止下次重复
+            _track_topic(msg)
             _push("context", msg)
             _pushed_ids.add(sid)
             return True
