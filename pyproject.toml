@@ -9,6 +9,8 @@ description = "Calendar and reminder tools for nanobot - 日程管理和提醒�
 requires-python = ">=3.10"
 dependencies = [
     "apscheduler>=3.11",
+    "chromadb>=0.4",
+    "sentence-transformers>=2.2",
 ]
 
 [project.entry-points."nanobot.tools"]
@@ -29,3 +31,6 @@ remember = "nanobot_calendar.memory_tools:RememberTool"
 my_profile = "nanobot_calendar.memory_tools:MyProfileTool"
 emotion_detect = "nanobot_calendar.memory_tools:EmotionDetectTool"
 daily_reflection = "nanobot_calendar.memory_tools:DailyReflectionTool"
+rag_remember = "nanobot_calendar.rag_tools:RAGRememberTool"
+rag_search = "nanobot_calendar.rag_tools:RAGSearchTool"
+rag_context = "nanobot_calendar.rag_tools:RAGContextTool"

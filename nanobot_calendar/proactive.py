@@ -177,11 +177,16 @@ class FriendBrain:
 
     def _llm_chat(self, now: datetime) -> str | None:
         """用 LLM 生成一条自然的、个性化的主动聊天消息。"""
-        return self._call_llm(self._build_system_prompt(now), [
-            f"现在是{self._time_vibe(now.hour)}，像朋友一样发一条问候。不提日程不催事。1-2句带emoji。",
-            "发一条闲聊，问问用户最近怎么样、忙不忙、心情如何。1-2句。别编造不存在的事。",
-            "关心一下朋友，随口问个近况。像突然想起来找他聊天。1-2句，别啰嗦。",
-        ])
+        query = f"用户{self._time_vibe(now.hour)}的习惯和偏好"
+        return self._call_llm(
+            self._build_system_prompt(now, query),
+            [
+                f"现在是{self._time_vibe(now.hour)}，像朋友一样发一条问候。不提日程不催事。1-2句带emoji。",
+                "发一条闲聊，问问用户最近怎么样、忙不忙、心情如何。1-2句。别编造不存在的事。",
+                "关心一下朋友，随口问个近况。像突然想起来找他聊天。1-2句，别啰嗦。",
+            ],
+            rag_query=query,
+        )
 
     def _morning_llm(self, now: datetime, events_today: list) -> str | None:
         """用 LLM 生成早安问候，包含今日日程概览"""
@@ -198,13 +203,17 @@ class FriendBrain:
             lines.append(f"{icon} {t} {title}")
 
         schedule_text = "\n".join(lines) if lines else "今天没有日程安排"
-        system = self._build_system_prompt(now)
-        prompts = [
-            f"早上好！现在是{self._time_vibe(now.hour)}。用户今天的日程：\n{schedule_text}\n\n"
-            "像朋友一样发早安问候，自然地提一下今天的日程。如果没日程就说点轻松的。"
-            "语气要自然口语化，2-3句，用emoji和波浪线～。不要像播报员一样列清单。",
-        ]
-        return self._call_llm(system, prompts, temperature=0.95)
+        query = "用户早晨的日常习惯 固定安排 偏好"
+        return self._call_llm(
+            self._build_system_prompt(now, query),
+            [
+                f"早上好！现在是{self._time_vibe(now.hour)}。用户今天的日程：\n{schedule_text}\n\n"
+                "像朋友一样发早安问候，自然地提一下今天的日程。如果没日程就说点轻松的。"
+                "语气要自然口语化，2-3句，用emoji和波浪线～。不要像播报员一样列清单。",
+            ],
+            temperature=0.95,
+            rag_query=query,
+        )
 
     def _evening_llm(self, now: datetime) -> str | None:
         """用 LLM 生成晚安问候 + 每日小结"""
@@ -215,15 +224,19 @@ class FriendBrain:
         done = [e for e in events_today if e['start_time'] < now.isoformat()]
         pending = [e for e in events_today if e['start_time'] >= now.isoformat()]
         ctx = f"已完成{len(done)}个日程" + (f"，还有{len(pending)}个待完成" if pending else "，全部完成啦")
-        system = self._build_system_prompt(now)
-        prompts = [
-            f"现在是晚上，{ctx}。像朋友一样发晚安问候，可以鼓励或关心一下。"
-            "2-3句，语气温暖自然，用emoji和波浪线～。",
-        ]
-        return self._call_llm(system, prompts, temperature=0.95)
+        query = "用户今天做了什么 心情 习惯 反思"
+        return self._call_llm(
+            self._build_system_prompt(now, query),
+            [
+                f"现在是晚上，{ctx}。像朋友一样发晚安问候，可以鼓励或关心一下。"
+                "2-3句，语气温暖自然，用emoji和波浪线～。",
+            ],
+            temperature=0.95,
+            rag_query=query,
+        )
 
-    def _build_system_prompt(self, now: datetime) -> str:
-        """构建 LLM 系统提示"""
+    def _build_system_prompt(self, now: datetime, context_query: str = "") -> str:
+        """构建 LLM 系统提示，可选注入 RAG 上下文"""
         try:
             from nanobot_calendar import memory_engine as mem
             data = mem._load()
@@ -235,16 +248,37 @@ class FriendBrain:
         except Exception:
             name, prefs, habits = "", {}, {}
         hour = now.hour
+        minute = now.minute
         time_vibe = self._time_vibe(hour)
-        return (
+        ampm = "上午" if hour < 12 else "下午" if hour < 18 else "晚上"
+
+        base = (
             "你是一个日程助手，也是用户的好朋友。语气自然、口语化、带点温度、像微信聊天。"
             "用'啦嘛哦哈诶呢呀叭'、emoji、波浪线～"
-            f"用户叫{name if name else '朋友'}。{time_vibe}了。"
+            f"用户叫{name if name else '朋友'}。"
+            f"现在是{now.strftime('%Y年%m月%d日')} {ampm}{hour}点{minute}分（{time_vibe}）。"
             f"{'习惯晚上学习' if prefs.get('study') == 'evening' else ''}"
             f"{'作息：'+habits.get('sleep_time','')+'睡 '+habits.get('wake_time','')+'起' if habits else ''}"
-            "【关键】别凭空编造你不知道的事（比如'我发现一本好看的小说'——用户一问细节你就露馅了）。"
-            "要么关心近况，要么推荐具体的东西（说出名字）。"
+            "【关键规则】"
+            "1. 要有常识！用户说'十二点'要根据现在是上午还是晚上来判断是中午还是午夜——"
+            "晚上聊天时说'十二点'就是午夜，中午说就是中午。别问蠢问题。"
+            "2. 别提和当前时间矛盾的推荐——晚上10点别推荐吃午饭，早上8点别推荐吃晚饭。"
+            "3. 别凭空编造你不知道的事（比如'我发现一本好看的小说'——用户一问细节你就露馅了）。"
+            "4. 要么关心近况，要么推荐具体的东西（说出名字）。"
         )
+
+        # 注入 RAG 检索到的相关记忆
+        if context_query:
+            try:
+                from nanobot_calendar.rag_memory import get_rag
+                rag = get_rag()
+                rag_context = rag.get_context_for_prompt(context_query, k=3)
+                if rag_context:
+                    base += f"\n\n{rag_context}"
+            except Exception:
+                pass
+
+        return base
 
     @staticmethod
     def _time_vibe(hour: int) -> str:
@@ -253,8 +287,17 @@ class FriendBrain:
         if 14 <= hour < 18: return "下午"
         return "晚上"
 
-    def _call_llm(self, system: str, prompts: list[str], temperature: float = 0.9) -> str | None:
-        """调用 LLM，失败返回 None"""
+    def _call_llm(self, system: str, prompts: list[str], temperature: float = 0.9, rag_query: str = "") -> str | None:
+        """调用 LLM，失败返回 None。rag_query 用于检索相关记忆注入 prompt。"""
+        if rag_query:
+            try:
+                from nanobot_calendar.rag_memory import get_rag
+                rag = get_rag()
+                ctx = rag.get_context_for_prompt(rag_query, k=3)
+                if ctx:
+                    system += f"\n\n{ctx}"
+            except Exception:
+                pass
         import json
         from pathlib import Path
         try:

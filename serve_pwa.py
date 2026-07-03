@@ -136,6 +136,10 @@ if __name__ == "__main__":
     from nanobot_calendar.proactive import get_brain
     get_brain().start()
 
+    # 初始化 RAG 记忆引擎
+    from nanobot_calendar.rag_memory import init_rag
+    init_rag(import_json=True)
+
     server = http.server.HTTPServer((host, port), PWAHandler)
 
     print("=" * 55)
@@ -144,6 +148,7 @@ if __name__ == "__main__":
     print(f"  Local:       http://localhost:{port}")
     print(f"  Mobile:      http://{local_ip}:{port}")
     print(f"  Brain:       active (adaptive: 20s-120s)")
+    print(f"  RAG:         enabled (vector memory)")
     print(f"  Alerts:      upcoming events")
     print(f"  Content:     missing reminders")
     print(f"  Context:     daily summary")
