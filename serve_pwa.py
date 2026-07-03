@@ -140,6 +140,11 @@ if __name__ == "__main__":
     from nanobot_calendar.rag_memory import init_rag
     init_rag(import_json=True)
 
+    # 启动对话历史索引器（每5分钟扫描新对话）
+    from nanobot_calendar.conversation_indexer import ConversationWatcher
+    conv_watcher = ConversationWatcher(interval_seconds=300)
+    conv_watcher.start()
+
     server = http.server.HTTPServer((host, port), PWAHandler)
 
     print("=" * 55)
