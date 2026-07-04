@@ -140,6 +140,14 @@ if __name__ == "__main__":
     from nanobot_calendar.rag_memory import init_rag
     init_rag(import_json=True)
 
+    # 自动导入 knowledge/ 目录下的文档
+    from nanobot_calendar.knowledge_base import get_kb
+    kb = get_kb()
+    kb_dir = Path(__file__).parent / "knowledge"
+    if kb_dir.is_dir() and kb.count() == 0:
+        imported = kb.ingest_directory(str(kb_dir))
+        print(f"  KB: {imported}")
+
     # 启动对话历史索引器（每5分钟扫描新对话）
     from nanobot_calendar.conversation_indexer import ConversationWatcher
     conv_watcher = ConversationWatcher(interval_seconds=300)

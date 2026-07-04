@@ -146,8 +146,11 @@ class KnowledgeBase:
         results = self._collection.get()
         docs: dict[str, dict] = {}
         if results["ids"]:
+            metas = results.get("metadatas", [])
+            if metas and isinstance(metas[0], list):
+                metas = metas[0]  # ChromaDB newer API returns [[...]]
             for i, doc_id in enumerate(results["ids"]):
-                meta = results["metadatas"][0][i] if results["metadatas"] else {}
+                meta = metas[i] if i < len(metas) else {}
                 title = meta.get("title", "unknown")
                 if title not in docs:
                     docs[title] = {
