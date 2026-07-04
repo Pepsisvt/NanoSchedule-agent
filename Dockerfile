@@ -1,13 +1,12 @@
 FROM python:3.12-slim
 
 RUN apt-get update && apt-get install -y nginx && rm -rf /var/lib/apt/lists/*
+RUN rm -f /etc/nginx/sites-enabled/default
 
 WORKDIR /app
 COPY . .
 
-RUN pip install --no-cache-dir -r requirements.txt && pip install -e .
-
-COPY nginx.conf /etc/nginx/sites-available/default
+RUN pip install --no-cache-dir -r requirements.txt
 
 EXPOSE 10000
 

@@ -22,9 +22,34 @@ else
   echo "[WARN] DEEPSEEK_API_KEY not set — Agent will not work!"
 fi
 
-# 将 Render 分配的端口注入 nginx 配置
-sed -i "s/__PORT__/${PORT:-10000}/g" /etc/nginx/conf.d/default.conf
-echo "[OK] nginx port set to ${PORT:-10000}"
+# 生成 nginx 配置（端口由 Render 动态分配）
+NGINX_PORT="${PORT:-10000}"
+cat > /etc/nginx/conf.d/default.conf << NGINXEOF
+server {
+    listen ${NGINX_PORT};
+
+    # WebSocket → gateway
+    location /ws {
+        proxy_pass http://127.0.0.1:18790;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade \$http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host \$host;
+        proxy_read_timeout 86400;
+    }
+
+    # API → PWA
+    location /api/ {
+        proxy_pass http://127.0.0.1:3000;
+    }
+
+    # Static → PWA
+    location / {
+        proxy_pass http://127.0.0.1:3000;
+    }
+}
+NGINXEOF
+echo "[OK] nginx config written for port ${NGINX_PORT}"
 
 # 启动 nginx
 nginx -t && nginx
