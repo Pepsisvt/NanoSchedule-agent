@@ -49,7 +49,7 @@ server {
 
     # WebSocket → gateway
     location /ws {
-        proxy_pass http://127.0.0.1:18790;
+        proxy_pass http://127.0.0.1:8765;
         proxy_http_version 1.1;
         proxy_set_header Upgrade \$http_upgrade;
         proxy_set_header Connection "upgrade";
