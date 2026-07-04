@@ -9,6 +9,8 @@
 [![RAG](https://img.shields.io/badge/RAG-ChromaDB-red)]()
 [![Deploy](https://img.shields.io/badge/Live_Demo-Render-4351e8)](https://nanoschedule-agent.onrender.com)
 
+> 💡 **在线体验**：点击上方 Live Demo 徽章即可打开部署在 Render 上的日程助手，直接在网页端对话测试日程管理、提醒设置、知识库问答等功能。
+
 ## 项目简介
 
 基于 [nanobot](https://github.com/HKUDS/nanobot)（HKUDS 开源 AI Agent 框架）二次开发，构建一个能够在移动端使用的 AI 日程管理助手。

@@ -26,3 +26,8 @@ logs/
 
 # Database (sensitive)
 *.db
+
+# Course report files
+generate_report.py
+课程设计报告_NanoSchedule.docx
+~$课程设计报告_NanoSchedule.docx
