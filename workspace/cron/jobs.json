@@ -36,6 +36,161 @@
       "deleteAfterRun": true
     },
     {
+      "id": "2140bc40",
+      "name": "proactive:ou_6f0eb9982",
+      "enabled": true,
+      "schedule": {
+        "kind": "every",
+        "atMs": null,
+        "everyMs": 1800000,
+        "expr": null,
+        "tz": null
+      },
+      "payload": {
+        "kind": "agent_turn",
+        "message": "你现在要像朋友一样主动找用户聊聊天！先看看用户最近日程、有没有即将开始的事、有没有什么值得关心的。然后选一个开场：\n\n1) 日程提醒类：有会议快开始了就提醒一下\n2) 关心类：日程排太满了提醒休息，或者空了建议安排\n3) 闲聊类：如果没什么特别的，就随便问候一下（'嘿，在干嘛呢~'、'今天过得怎么样呀'）\n\n记住：语气要像朋友发微信，随便自然——用'啦嘛哦哈诶呢呀叭'、用emoji、用波浪线～不要长篇大论，2-3句话就够了。如果用户日程很合理没什么要说的，就随便问个好。\n不要用'定时推送'、'分析报告'、'主动建议'这类词——就像你突然想起来找他聊天一样。\n【重要】不要每次都说同一个话题！如果上次聊了吃饭/聚餐，这次换别的——关心心情、\n问问最近忙不忙、聊聊天气、推荐个电影……总之话题要轮换，别像复读机。\n【关键】不要凭空编造你其实不知道的事！比如别说'我发现一本好看的小说'（然后用户问哪本你就懵了）。\n要聊就聊你能接住的：问用户的近况、关心日程、或者直接推荐具体的东西（'最近《XX》挺火的，你看了吗'）。",
+        "deliver": false,
+        "channel": null,
+        "to": null,
+        "channelMeta": {},
+        "sessionKey": "unified:default",
+        "originChannel": "feishu",
+        "originChatId": "ou_6f0eb9982c6c21a81657c43600a874fc",
+        "originMetadata": {}
+      },
+      "state": {
+        "nextRunAtMs": 1783163732674,
+        "lastRunAtMs": 1783161923727,
+        "lastStatus": "ok",
+        "lastError": null,
+        "runHistory": [
+          {
+            "runAtMs": 1783056050628,
+            "status": "ok",
+            "durationMs": 13344,
+            "error": null
+          },
+          {
+            "runAtMs": 1783057863985,
+            "status": "ok",
+            "durationMs": 8717,
+            "error": null
+          },
+          {
+            "runAtMs": 1783059672706,
+            "status": "ok",
+            "durationMs": 8721,
+            "error": null
+          },
+          {
+            "runAtMs": 1783061481434,
+            "status": "ok",
+            "durationMs": 8147,
+            "error": null
+          },
+          {
+            "runAtMs": 1783063289601,
+            "status": "ok",
+            "durationMs": 9180,
+            "error": null
+          },
+          {
+            "runAtMs": 1783065098782,
+            "status": "ok",
+            "durationMs": 8099,
+            "error": null
+          },
+          {
+            "runAtMs": 1783066906884,
+            "status": "ok",
+            "durationMs": 9504,
+            "error": null
+          },
+          {
+            "runAtMs": 1783068716413,
+            "status": "ok",
+            "durationMs": 8718,
+            "error": null
+          },
+          {
+            "runAtMs": 1783070525140,
+            "status": "ok",
+            "durationMs": 8251,
+            "error": null
+          },
+          {
+            "runAtMs": 1783077820308,
+            "status": "ok",
+            "durationMs": 20507,
+            "error": null
+          },
+          {
+            "runAtMs": 1783079640830,
+            "status": "ok",
+            "durationMs": 9302,
+            "error": null
+          },
+          {
+            "runAtMs": 1783081450148,
+            "status": "ok",
+            "durationMs": 7536,
+            "error": null
+          },
+          {
+            "runAtMs": 1783083257688,
+            "status": "ok",
+            "durationMs": 9024,
+            "error": null
+          },
+          {
+            "runAtMs": 1783085066732,
+            "status": "ok",
+            "durationMs": 8308,
+            "error": null
+          },
+          {
+            "runAtMs": 1783086875062,
+            "status": "ok",
+            "durationMs": 9102,
+            "error": null
+          },
+          {
+            "runAtMs": 1783088684173,
+            "status": "ok",
+            "durationMs": 9080,
+            "error": null
+          },
+          {
+            "runAtMs": 1783156495173,
+            "status": "ok",
+            "durationMs": 9049,
+            "error": null
+          },
+          {
+            "runAtMs": 1783158304232,
+            "status": "ok",
+            "durationMs": 9866,
+            "error": null
+          },
+          {
+            "runAtMs": 1783160114123,
+            "status": "ok",
+            "durationMs": 9581,
+            "error": null
+          },
+          {
+            "runAtMs": 1783161923727,
+            "status": "ok",
+            "durationMs": 8947,
+            "error": null
+          }
+        ]
+      },
+      "createdAtMs": 1782991548186,
+      "updatedAtMs": 1783161932674,
+      "deleteAfterRun": false
+    },
+    {
       "id": "dream",
       "name": "dream",
       "enabled": true,
@@ -59,21 +214,21 @@
         "originMetadata": {}
       },
       "state": {
-        "nextRunAtMs": 1782976922783,
-        "lastRunAtMs": 1782969722778,
+        "nextRunAtMs": 1783169106592,
+        "lastRunAtMs": 1783161895175,
         "lastStatus": "ok",
         "lastError": null,
         "runHistory": [
           {
-            "runAtMs": 1782969722778,
+            "runAtMs": 1783161895175,
             "status": "ok",
-            "durationMs": 5,
+            "durationMs": 11417,
             "error": null
           }
         ]
       },
-      "createdAtMs": 1782959161561,
-      "updatedAtMs": 1782969722783,
+      "createdAtMs": 1783154695145,
+      "updatedAtMs": 1783161906592,
       "deleteAfterRun": false
     },
     {
@@ -100,21 +255,39 @@
         "originMetadata": {}
       },
       "state": {
-        "nextRunAtMs": 1782971522784,
-        "lastRunAtMs": 1782969722783,
+        "nextRunAtMs": 1783163732676,
+        "lastRunAtMs": 1783161932674,
         "lastStatus": "ok",
         "lastError": null,
         "runHistory": [
           {
-            "runAtMs": 1782969722783,
+            "runAtMs": 1783156504222,
+            "status": "ok",
+            "durationMs": 3,
+            "error": null
+          },
+          {
+            "runAtMs": 1783158314098,
+            "status": "ok",
+            "durationMs": 2,
+            "error": null
+          },
+          {
+            "runAtMs": 1783160123704,
             "status": "ok",
             "durationMs": 1,
+            "error": null
+          },
+          {
+            "runAtMs": 1783161932674,
+            "status": "ok",
+            "durationMs": 2,
             "error": null
           }
         ]
       },
-      "createdAtMs": 1782959161565,
-      "updatedAtMs": 1782969722784,
+      "createdAtMs": 1783154695151,
+      "updatedAtMs": 1783161932676,
       "deleteAfterRun": false
     }
   ]
