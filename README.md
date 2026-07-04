@@ -7,6 +7,7 @@
 [![nanobot](https://img.shields.io/badge/nanobot-v0.2.2-orange)](https://github.com/HKUDS/nanobot)
 [![DeepSeek](https://img.shields.io/badge/LLM-DeepSeek-purple)](https://deepseek.com)
 [![RAG](https://img.shields.io/badge/RAG-ChromaDB-red)]()
+[![Deploy](https://img.shields.io/badge/Live_Demo-Render-4351e8)](https://你的应用名.onrender.com)
 
 ## 项目简介
 
@@ -229,6 +230,20 @@ python serve_pwa.py
 **step 4**：重启 Gateway 即可在飞书与 Agent 对话，定时提醒也会推送到飞书。
 
 > 💡 飞书和网页端数据互通，在飞书创建的日程和提醒，网页端同样可见。
+
+### 7. 在线部署（Render）
+
+项目已配置 Docker 一键部署，无需服务器。
+
+**step 1**：Fork 本仓库，注册 [Render](https://render.com)（GitHub 登录）
+
+**step 2**：New Web Service → 选择仓库 → 自动识别 Dockerfile
+
+**step 3**：添加环境变量 `DEEPSEEK_API_KEY` = 你的 API Key
+
+**step 4**：点击部署，3 分钟后访问 `https://你的应用名.onrender.com`
+
+部署后把链接填入 README 顶部的 Live Demo 徽章即可。
 
 ## 演示示例
 
