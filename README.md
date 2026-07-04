@@ -2,11 +2,56 @@
 
 > 开源技术与应用 课程项目
 
+[![Python](https://img.shields.io/badge/Python-3.12-blue)](https://python.org)
+[![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
+[![nanobot](https://img.shields.io/badge/nanobot-v0.2.2-orange)](https://github.com/HKUDS/nanobot)
+[![DeepSeek](https://img.shields.io/badge/LLM-DeepSeek-purple)](https://deepseek.com)
+[![RAG](https://img.shields.io/badge/RAG-ChromaDB-red)]()
+
 ## 项目简介
 
 基于 [nanobot](https://github.com/HKUDS/nanobot)（HKUDS 开源 AI Agent 框架）二次开发，构建一个能够在移动端使用的 AI 日程管理助手。
 
 **核心能力**：用户通过自然语言与 Agent 对话，Agent 自主调用 22 个工具完成日程管理、提醒推送、知识检索、语义记忆等操作。支持飞书和网页双通道，具备 RAG 记忆系统和主动推送引擎。
+
+## 系统架构
+
+```mermaid
+graph TB
+    U[👤 用户] -->|飞书| FEISHU[飞书 API]
+    U -->|浏览器| PWA[📱 PWA 前端<br/>微信风格界面]
+    
+    FEISHU -->|HTTP| GW[nanobot Gateway<br/>消息路由 + 会话管理]
+    PWA -->|WebSocket:8765| GW
+    
+    GW --> AGENT[🧠 Agent 引擎<br/>ReAct 循环 + Prompt 优化]
+    
+    AGENT -->|Function Calling| TOOLS
+    
+    subgraph TOOLS[🔧 22 个自定义工具]
+        CAL[日程管理 ×5<br/>CRUD + 冲突检测]
+        REM[提醒管理 ×4<br/>定时 + Cron]
+        PRO[主动推送 ×2<br/>PWA + 飞书]
+        MEM[记忆系统 ×4<br/>画像 + 情绪]
+        RAG[🗂️ RAG ×6<br/>语义记忆 + KB + 对话]
+        ADV[分析协调 ×1<br/>统计 + 建议]
+    end
+    
+    TOOLS --> RAG_LAYER
+    
+    subgraph RAG_LAYER[📚 RAG 记忆层]
+        CHROMA[(ChromaDB<br/>向量数据库)]
+        EMBED[句子嵌入模型<br/>all-MiniLM-L6-v2]
+        KB_DOCS[📄 知识库文档<br/>课表/校历]
+        CONV[💬 对话索引<br/>自动增量索引]
+    end
+    
+    TOOLS --> DB[(SQLite<br/>日程数据库)]
+    RAG_LAYER --> DB
+    
+    GW -->|定期心跳| CRON[⏰ Cron 定时任务<br/>Dream / Heartbeat]
+    GW -->|工具代理| MCP[🔌 MCP Server<br/>Calendar + Memory]
+```
 
 ## 架构设计
 
@@ -229,6 +274,63 @@ nanobot agent -m "取消ID为3的提醒"
 - 集成了 ChromaDB 向量数据库实现 RAG 语义检索
 - 定制了 Agent 行为配置（SOUL.md，含 Few-shot 示例）
 - 添加了 PWA 移动端界面和保活监控脚本
+
+## 项目展示指南
+
+无需答辩，以下方式可以全面展示项目能力：
+
+### 🎬 录制 Demo 视频（推荐，3-5分钟）
+
+用 OBS 或 Windows 自带录屏（Win+G）依次录制：
+
+| 序号 | 场景 | 演示内容 |
+|------|------|---------|
+| 1 | 创建日程 | "明天下午3点开会，地点A101，提前10分钟提醒我" |
+| 2 | 查询日程 | "明天有什么安排"、"这周忙不忙" |
+| 3 | RAG 记忆 | "帮我记住：我喜欢吃川菜" → "我想吃辣的有什么推荐" |
+| 4 | 知识库 | "帮我导入课表" → "周三有什么课" |
+| 5 | 对话历史 | "上次我们聊过什么" |
+| 6 | 情绪识别 | "今天好累" → Agent 给出减压建议 |
+| 7 | 主动推送 | 等待 FriendBrain 自动发早安/提醒 |
+| 8 | 飞书联动 | 展示飞书端收到同样的日程和提醒 |
+
+### 📊 数据展示
+
+| 指标 | 数值 |
+|------|------|
+| 自定义工具 | 22 个 |
+| 总代码行数 | ~5,200 行 |
+| Python 源文件 | 16 个 |
+| RAG 记忆数 | 11+ 条 |
+| 对话索引 | 49+ 条 |
+| 关系等级 | familiar（30+ 次对话） |
+
+### 📁 项目结构（完整）
+
+```
+NanoSchedule/
+├── nanobot_calendar/         # 16 个 Python 源文件
+│   ├── db.py                 # SQLite 数据库层
+│   ├── calendar_tools.py     # 日程 CRUD 工具
+│   ├── reminder_tools.py     # 提醒管理工具
+│   ├── proactive.py          # 主动推送引擎
+│   ├── memory_engine.py      # 用户画像引擎
+│   ├── rag_memory.py         # RAG 语义记忆
+│   ├── rag_tools.py          # RAG 检索工具
+│   ├── knowledge_base.py     # 知识库引擎
+│   ├── conversation_indexer.py # 对话历史索引
+│   ├── kb_tools.py           # KB + 对话搜索工具
+│   ├── coordinator.py        # 多 Agent 协调
+│   ├── advisor.py            # 日程分析
+│   └── stats_api.py          # 统计 API
+├── mcp_servers/              # MCP 协议服务
+├── webui/                    # PWA 前端
+├── workspace/                # Agent 配置 + 数据
+├── knowledge/                # 知识库文档目录
+├── start.bat                 # 一键启动
+├── start_keepalive.bat       # 保活监控
+└── generate_report.py        # 课程报告生成脚本
+```
 
 ## 许可证
 
